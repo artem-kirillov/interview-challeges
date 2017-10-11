@@ -28,6 +28,7 @@ public class Problem76MinimumWindowSubstringTest {
         assertEquals("aec", new Problem76MinimumWindowSubstring().minWindow("cabefgecdaecf", "cae"));
         assertEquals("cwae", new Problem76MinimumWindowSubstring().minWindow("cabwefgewcwaefgcf","cae"));
         assertEquals("aaa", new Problem76MinimumWindowSubstring().minWindow("aaflslflsldkalskaaa", "aaa"));
+        assertEquals("", new Problem76MinimumWindowSubstring().minWindow("a", "b"));
     }
 
     @Test

@@ -11,21 +11,18 @@ public class Problem76MinimumWindowSubstring {
 //    Minimum window is "BANC".
     public String minWindow(String s, String t) {
         String window = null;
-        Queue<Character> curWindow = new ArrayDeque<>();
+        final Queue<Character> curWindow = new LinkedList<>();
 
-        Map<Character, Integer> expectedCounts = Collections.unmodifiableMap(buildIndex(t));
-        Map<Character, Integer> curCounts = buildIndex(t);
-        Map<Character, Integer> statCounts = new HashMap<>();
+        final Map<Character, Integer> expectedCounts = Collections.unmodifiableMap(buildIndex(t));
+        final Map<Character, Integer> curCounts = buildIndex(t);
+        final Map<Character, Integer> statCounts = new HashMap<>();
 
         int endIndex = s.length();
-        for (int i = s.length() - 1; i >= 0; i--) {
-            if (expectedCounts.containsKey(s.charAt(i))) {
-                endIndex = Math.min(endIndex, i + 1);
-                break;
-            }
+        while (endIndex > 0 && !expectedCounts.containsKey(s.charAt(endIndex - 1))) {
+            endIndex -= 1;
         }
 
-        for (char ch : s.substring(0, endIndex).toCharArray()) {
+        for (final Character ch : s.substring(0, endIndex).toCharArray()) {
             if (curWindow.isEmpty() && !expectedCounts.containsKey(ch)) {
                 continue;
             }
@@ -34,38 +31,21 @@ public class Problem76MinimumWindowSubstring {
                 incr(statCounts, ch);
             }
 
-            if (!curWindow.isEmpty() && !curCounts.containsKey(ch) && curWindow.peek().equals(ch)) {
-                Character head = curWindow.remove();
-                decr(statCounts, head);
-                if (statCounts.getOrDefault(head, 0) < expectedCounts.get(head)) {
-                    incr(curCounts, head);
-                }
-
-                padWindow(curWindow, expectedCounts);
-
-                while (!curWindow.isEmpty() && !curCounts.containsKey(curWindow.peek()) && statCounts.getOrDefault(curWindow.peek(), 0) > expectedCounts.get(curWindow.peek())) {
-                    decr(statCounts, curWindow.remove());
-                    padWindow(curWindow, expectedCounts);
-                }
+            while (!curWindow.isEmpty() && (
+                    !expectedCounts.containsKey(curWindow.peek()) ||
+                            statCounts.getOrDefault(curWindow.peek(), 0) > expectedCounts.get(curWindow.peek()))) {
+                decr(statCounts, curWindow.remove());
             }
 
             curWindow.add(ch);
             decr(curCounts, ch);
 
-            if (curCounts.isEmpty()) {
-                if (window == null || curWindow.size() < window.length()) {
-                    window = toStr(curWindow);
-                }
+            if (curCounts.isEmpty() && (window == null || curWindow.size() < window.length())) {
+                window = toStr(curWindow);
             }
         }
 
         return window == null ? "" : window;
-    }
-
-    private static void padWindow(Queue<Character> curWindow, Map<Character, Integer> expectedCounts) {
-        while (!curWindow.isEmpty() && !expectedCounts.containsKey(curWindow.peek())) {
-            curWindow.remove();
-        }
     }
 
     private static Map<Character, Integer> buildIndex(String t) {
