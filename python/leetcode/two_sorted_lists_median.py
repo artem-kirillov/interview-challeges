@@ -7,19 +7,28 @@ class Solution:
     def getMax(nums):
         return nums[-1]
 
-    def partitionBy(self, lst, val, offset=0):
+    @staticmethod
+    def partitionBy(lst, val):
+        list_len = len(lst)
         if lst[0] > val:
-            return offset
+            return 0
         if lst[-1] <= val:
-            return offset + len(lst) - 1
+            return list_len - 1
 
-        i = int((len(lst) - 1) / 2)
-        if lst[i] <= val < lst[i + 1]:
-            return offset + i
-        elif lst[i] > val:
-            return self.partitionBy(lst[:i], val, offset)
-        else:
-            return self.partitionBy(lst[i+1:], val, offset+i+1)
+        cur_split_idx = int((list_len - 1) / 2)
+        start_idx = 0
+        end_idx = list_len - 1
+        while end_idx - start_idx > 0:
+            if lst[start_idx] > val:
+                return start_idx - 1
+            if lst[end_idx] <= val:
+                return end_idx - 1
+            elif lst[cur_split_idx] > val:
+                end_idx -= cur_split_idx
+            else:
+                start_idx += cur_split_idx
+
+            cur_split_idx = int((end_idx - start_idx) / 2)
 
     def notIntersectedArrays(self, nums1, nums2, idx):
         return nums1[idx] if len(nums1) > idx else nums2[idx - len(nums1)]
@@ -28,15 +37,23 @@ class Solution:
         if len(nums1) == 0:
             return nums2[idx]
         elif len(nums2) == 0:
-            return nums1[0]
-        elif self.getMin(nums2) >= self.getMax(nums1):
+            return nums1[idx]
+
+        min1 = self.getMin(nums1)
+        max1 = self.getMax(nums1)
+        min2 = self.getMin(nums2)
+        max2 = self.getMax(nums2)
+        if min2 >= max1:
             return self.notIntersectedArrays(nums1, nums2, idx)
-        elif self.getMin(nums1) > self.getMax(nums2):
+        elif min1 > max2:
             return self.notIntersectedArrays(nums2, nums1, idx)
-        # elif len(nums1) > len(nums2):
         else:
-            part1_idx = int(len(nums1) / 2)
-            part2_idx = self.partitionBy(nums2, nums1[part1_idx])
+            if len(nums1) > len(nums2):
+                part1_idx = int(len(nums1) / 2)
+                part2_idx = self.partitionBy(nums2, nums1[part1_idx])
+            else:
+                part2_idx = int(len(nums2) / 2)
+                part1_idx = self.partitionBy(nums2, nums1[part2_idx])
 
             left_part_len = part1_idx + part2_idx
             if left_part_len > idx:
@@ -75,3 +92,5 @@ if __name__ == '__main__':
     assertThat(lambda: find([1, 2, 3, 4, 6, 10], [7]), 4)
     assertThat(lambda: find([1, 2, 3, 6, 7], [4, 5]), 4)
     assertThat(lambda: find([1, 2, 3, 6], [4, 5]), 3.5)
+
+    assertThat(lambda: find([3, 4], []), 3.5)
