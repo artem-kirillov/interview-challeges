@@ -1,3 +1,17 @@
+class ListView(object):
+    def __init__(self, lst, offset=0, length=None):
+        self.lst = lst
+        self.offset = offset
+        self.length = length or len(lst)
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, key):
+        assert 0 <= key < self.length
+        return self.lst[key + self.offset]
+
+
 class Solution:
     @staticmethod
     def getMin(nums):
@@ -5,14 +19,14 @@ class Solution:
 
     @staticmethod
     def getMax(nums):
-        return nums[-1]
+        return nums[len(nums) - 1]
 
     @staticmethod
     def partitionBy(lst, val):
         list_len = len(lst)
         if lst[0] > val:
             return 0
-        if lst[-1] <= val:
+        if lst[len(lst) - 1] <= val:
             return list_len - 1
 
         cur_split_idx = int((list_len - 1) / 2)
@@ -48,27 +62,27 @@ class Solution:
         elif min1 > max2:
             return self.notIntersectedArrays(nums2, nums1, idx)
         else:
-            if len(nums1) > len(nums2):
-                part1_idx = int(len(nums1) / 2)
-                part2_idx = self.partitionBy(nums2, nums1[part1_idx])
-            else:
-                part2_idx = int(len(nums2) / 2)
-                part1_idx = self.partitionBy(nums2, nums1[part2_idx])
+            part1_idx = int(len(nums1) / 2)
+            part2_idx = self.partitionBy(nums2, nums1[part1_idx])
 
             left_part_len = part1_idx + part2_idx
             if left_part_len > idx:
-                return self.findGlobalNthElem(nums1[:part1_idx], nums2[:part2_idx], idx)
+                return self.findGlobalNthElem(
+                    ListView(nums1.lst, nums1.offset, part1_idx),
+                    ListView(nums2.lst, nums2.offset, part2_idx), idx)
             else:
-                return self.findGlobalNthElem(nums1[part1_idx:], nums2[part2_idx:], idx - left_part_len)
+                return self.findGlobalNthElem(
+                    ListView(nums1.lst, part1_idx, nums1.length - part1_idx),
+                    ListView(nums2.lst, part2_idx, nums2.length - part2_idx), idx - left_part_len)
 
     def findMedianSortedArrays(self, nums1, nums2):
         global_len = len(nums1) + len(nums2)
 
         if global_len % 2 == 0:
-            return (self.findGlobalNthElem(nums1, nums2, int(global_len / 2) - 1) +
-                    self.findGlobalNthElem(nums1, nums2, int(global_len / 2))) / 2.0
+            return (self.findGlobalNthElem(ListView(nums1), ListView(nums2), int(global_len / 2) - 1) +
+                    self.findGlobalNthElem(ListView(nums1), ListView(nums2), int(global_len / 2))) / 2.0
         else:
-            return self.findGlobalNthElem(nums1, nums2, int(global_len / 2))
+            return self.findGlobalNthElem(ListView(nums1), ListView(nums2), int(global_len / 2))
 
 
 if __name__ == '__main__':
