@@ -1,3 +1,6 @@
+# https://leetcode.com/problems/median-of-two-sorted-arrays/
+
+
 class ListView(object):
     def __init__(self, lst, offset=0, length=None):
         self.lst = lst
@@ -12,7 +15,7 @@ class ListView(object):
         return self.lst[key + self.offset]
 
 
-class Solution:
+class Solution1:
     @staticmethod
     def getMin(nums):
         return nums[0]
@@ -86,7 +89,7 @@ class Solution:
 
 
 if __name__ == '__main__':
-    find = Solution().findMedianSortedArrays
+    find = Solution1().findMedianSortedArrays
 
 
     def assertThat(expr, expected):
