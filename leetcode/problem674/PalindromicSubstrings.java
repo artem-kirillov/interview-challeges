@@ -3,19 +3,14 @@
  */
 public class PalindromicSubstrings {
     public int countSubstrings(String s) {
+        final int n = s.length();
         int res = 0;
-        for (int i = 0; i < s.length(); i++) {
-            for (int j = 0; j < s.length(); j++) {
-                if (i + j >= s.length()) break;
-                if (j == 1 || isPalindromic(s, i, i + j)) res++;
-            }
+        for (int pos = 0; pos < 2 * n - 1; pos++) {
+            int left = pos / 2;
+            int right = left + pos % 2;
+
+            while (left >= 0 && right < n && s.charAt(left--) == s.charAt(right++)) res++;
         }
         return res;
-    }
-
-    private static boolean isPalindromic(final String s, final int start, final int end) {
-        int l = start, r = end;
-        while (l < r) if (s.charAt(l++) != s.charAt(r--)) return false;
-        return true;
     }
 }
